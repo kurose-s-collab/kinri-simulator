@@ -1,0 +1,80 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --bg:#f6f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;
+  --blue:#2563eb;--red:#dc2626;--green:#059669;--amber:#d97706;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Hiragino Sans","Yu Gothic","YuGothic","Meiryo",sans-serif;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:18px}
+h1{margin:0 0 6px;font-size:clamp(24px,4vw,38px)}
+.sub{color:var(--muted);margin-bottom:16px;line-height:1.6}
+.card{
+  background:var(--card);border-radius:16px;padding:16px;
+  box-shadow:0 4px 18px rgba(0,0,0,.06);margin-bottom:16px
+}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+label{font-weight:700;display:block;margin-bottom:6px}
+input[type=range]{width:100%}
+input[type=number]{
+  width:100%;padding:10px;border:1px solid #d1d5db;border-radius:10px;font-size:16px
+}
+.value{font-size:28px;font-weight:800;margin-top:4px}
+.small{font-size:13px;color:var(--muted);line-height:1.6}
+button{
+  border:0;border-radius:12px;padding:11px 14px;font-size:15px;font-weight:700;
+  cursor:pointer;background:#e5e7eb;color:#111827
+}
+button.primary{background:#111827;color:white}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.stat{
+  padding:14px;border-radius:14px;background:#f3f4f6;
+}
+.stat b{font-size:22px}
+.badge{
+  display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;
+  background:#eef2ff;color:#3730a3
+}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}
+</style>
+
+<title>金利シミュレーター</title></head><body><div class="wrap">
+<h1>金利シミュレーター</h1>
+<div class="sub">借入額・返済年数・金利を変えると、毎月返済額と総返済額がどう変わるかを確認できます。</div>
+<div class="grid">
+<div class="card">
+<label>借入額（万円）</label><input id="loan" type="number" value="3700" min="100" step="100">
+<label style="margin-top:14px">返済年数</label><input id="years" type="number" value="35" min="1" max="50">
+<label style="margin-top:14px">金利（年利） <span class="badge" id="rateLabel">1.5%</span></label>
+<input id="rate" type="range" min="0" max="5" step="0.1" value="1.5">
+</div>
+<div class="card">
+<div class="stat">毎月返済額<br><b id="monthly">-</b></div>
+<div class="stat" style="margin-top:8px">総返済額<br><b id="total">-</b></div>
+<div class="stat" style="margin-top:8px">支払利息の合計<br><b id="interest">-</b></div>
+</div></div>
+<div class="card">
+<h2>比較</h2>
+<div class="row">
+<button onclick="setRate(1.0)">1.0%</button><button onclick="setRate(1.5)">1.5%</button>
+<button onclick="setRate(2.0)">2.0%</button><button onclick="setRate(2.5)">2.5%</button>
+<button onclick="setRate(3.0)">3.0%</button>
+</div>
+<p class="small">元利均等返済・ボーナス払いなしの単純モデルです。実際のローンでは手数料や金利タイプ等で結果が異なります。</p>
+</div></div>
+<script>
+const loan=document.getElementById('loan'),years=document.getElementById('years'),rate=document.getElementById('rate');
+const rateLabel=document.getElementById('rateLabel'),monthly=document.getElementById('monthly'),total=document.getElementById('total'),interest=document.getElementById('interest');
+const yen=n=>Math.round(n).toLocaleString('ja-JP')+'円';
+function calc(){let P=Number(loan.value)*10000,n=Number(years.value)*12,r=Number(rate.value)/100/12;
+let m=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);let t=m*n;
+rateLabel.textContent=Number(rate.value).toFixed(1)+'%';monthly.textContent=yen(m);total.textContent=yen(t);interest.textContent=yen(t-P);}
+function setRate(v){rate.value=v;calc()}
+[loan,years,rate].forEach(x=>x.addEventListener('input',calc));calc();
+</script></body></html>
